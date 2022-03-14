@@ -1,12 +1,13 @@
 #Fetch access token.
 $PayloadBody = @{
     grant_type    = "client_credentials"
-    client_id     = "<client id GUID>"
-    client_secret = "<client secret GUID>"
+    client_id     = "<Client ID GUID>"
+    client_secret = "<Client Secret GUID>"
 };
 
-# Put your hostname here
-$TokenUrl = "https://nightly.hyperviewhq.com/connect/token"
+# Put your Hyperview hostname here
+$HostName = "https://<Hyperview Hostname>"
+$TokenUrl = [string]::Format("{0}/connect/token", $HostName)
 
 $FetchTokenHeaders = @{
     "Content-Type" = "application/x-www-form-urlencoded"
@@ -27,11 +28,15 @@ $Headers = @{
     "Authorization" = "Bearer $accessToken";
 };
 
-Write-Host $accessToken
+Write-Host ("`nDebug: Access Token = $accessToken");
 
 # Invoke a simple API connection to fetch data
-## Put your hostname here as well
-$Response = Invoke-RestMethod -Uri "$TokenUrl/api/asset/assets?(limit)=25&(sort)=%2BId" -Method Get -Headers $Headers
+$Uri = [string]::Format("{0}/api/asset/assets?(limit)=25&(sort)=%2BId", $HostName);
+
+Write-Host("`nCalling Endpoint: $Uri`n");
+
+$Response = Invoke-RestMethod -Uri "$Uri" -Method Get -Headers $Headers
 
 # Write the data object to a JSON array
+
 $Response.data | ConvertTo-Json
