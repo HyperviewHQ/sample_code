@@ -1,13 +1,19 @@
+# Read Client Configuration
+$ClientConfiguration = Get-Content -Raw -Path ./conf/client_credential.json | ConvertFrom-Json
+
+# Read Hostname
+$HyperviewHost = Get-Content -Raw -Path ./conf/hostname.json | ConvertFrom-Json
+
 #Fetch access token.
 $PayloadBody = @{
     grant_type    = "client_credentials"
-    client_id     = "<Client ID GUID>"
-    client_secret = "<Client Secret GUID>"
+    client_id     = $ClientConfiguration.ClientId
+    client_secret = $ClientConfiguration.ClientSecret
 };
 
 # Put your Hyperview hostname here
-$HostName = "https://<Hyperview Hostname>"
-$TokenUrl = [string]::Format("{0}/connect/token", $HostName)
+$HostName = [string]::Format("https://{0}", $HyperviewHost.Hostname);
+$TokenUrl = [string]::Format("{0}/connect/token", $HostName);
 
 $FetchTokenHeaders = @{
     "Content-Type" = "application/x-www-form-urlencoded"
