@@ -1,3 +1,23 @@
+<#
+  .SYNOPSIS
+  Performs a simple API query.
+
+  .DESCRIPTION
+  This is a simple example script.
+
+  .PARAMETER InputPath
+  None. 
+
+  .PARAMETER OutputPath
+  None.
+
+  .INPUTS
+  Two configuration files. One for hostname and another for client credentials.
+
+  .OUTPUTS
+  API response in JSON to stdout.
+#>
+
 # Read Client Configuration
 $ClientConfiguration = Get-Content -Raw -Path ./conf/client_credential.json | ConvertFrom-Json
 
