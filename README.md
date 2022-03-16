@@ -1,6 +1,6 @@
 # Introduction
 
-This is a repository of sample API integration code for Hyperview. The hope is that Hyperview users would find them useful.
+This is a repository of API integration examples for Hyperview. The hope is that Hyperview users would find them useful.
 
 # Prerequisites
 
@@ -11,8 +11,8 @@ This is a repository of sample API integration code for Hyperview. The hope is t
 
 ## PowerShell
 
-Powershell scripts are tested with PowerShell 7 on Linux and Windows. We expect the scripts to also work on MacOS as well.
+Scripts are tested with PowerShell 7.x on Linux and Windows.
 
 # Contribution
 
-Contributions from customers and partners are welcome.
+Contributions are welcome.
