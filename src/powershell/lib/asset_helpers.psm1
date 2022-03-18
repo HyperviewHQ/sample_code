@@ -3,17 +3,18 @@
   A collection of asset API helper functions
 #>
 
-# Get Rack Id for an asset using advanced search API
+# Get Location Id for an asset using advanced search API
 function Get-LocationId {
     param (
         $AccessToken,
-        $LocationId,
-        $ApiHost
+        $Location,
+        $ApiHost,
+        $Type
     )
 
     $SearchUri = [string]::Format("https://{0}/api/asset/search", $ApiHost);
 
-    $LocationData = $LocationId.Split("/")
+    $LocationData = $Location.Split("/")
     $EndLocation = $LocationData[-1]
     $LocationPath = $LocationData[0..($LocationData.Length - 2)]
     $LocationPathTabbed = $LocationPath -Join "`t"
@@ -47,7 +48,7 @@ function Get-LocationId {
                         "must" = @(
                             @{
                                 "match" = @{
-                                    "assetType" = "Location";
+                                    "assetType" = "$Type";
                                 };
                             },
                             @{
@@ -87,9 +88,9 @@ function Get-LocationId {
         $AssetData = $Response.data | Where-Object { $_.displayName -eq $RackName }
     }
 
-    $RackId = $AssetData.id;
+    $Id = $AssetData.id;
 
-    return $RackId;
+    return $Id;
 }
 
 # Add Asset

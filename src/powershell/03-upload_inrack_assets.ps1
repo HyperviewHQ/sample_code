@@ -1,9 +1,9 @@
 <#
   .SYNOPSIS
-  Performs a simple upload of floor mounted assets.
+  Performs a simple upload of in rack assets.
 
   .DESCRIPTION
-  Performs a simple upload of floor mounted assets. Uses a standard CSV import format.
+  Performs a simple upload of in rack assets. Uses a standard CSV import format.
   Review example file for more information. Note that that import file uses internal IDs
   for model information and asset type.
 
@@ -15,11 +15,12 @@
 
   .INPUTS
   Two configuration files. One for hostname and another for client credentials.
-  Data file in ./data/floor_mounted.csv.
+  Data file in ./data/in_rack.csv.
 
   .OUTPUTS
   Status of uploads and any API error messages, where applicable.
 #>
+
 
 # Import asset helper functions
 Import-Module ./lib/asset_helpers.psm1
@@ -56,11 +57,11 @@ catch {
 }
 
 # Read CSV File
-$CsvData = Import-Csv -Path ./data/floor_mounted.csv
+$CsvData = Import-Csv -Path ./data/in_rack.csv
 
 # Start Upload Loop
 foreach ($line in $CsvData) {
-    $LocationId = Get-LocationId -AccessToken $accessToken -Location $line.Location -ApiHost $HostName -Type "Location";
+    $LocationId = Get-LocationId -AccessToken $accessToken -Location $line.Location -ApiHost $HostName -Type "Rack";
 
     $AssetObject = @{
         "name"                     = $line.Name;
@@ -75,7 +76,24 @@ foreach ($line in $CsvData) {
         );
         "assetLifecycleState"      = 0;
         "productId"                = $line.ModelId;
+        "locationData"             = @{
+            "parentId" = $LocationId;
+            "rackSide" = [string]($line.RackSide).ToLower();
+        };
     };
+
+    if (-not ([string]::IsNullOrEmpty($line.Elevation))) {
+        $assetObject.locationData += @{
+            "rackULocation" = $line.Elevation;
+        }
+    }
+
+    if (-not ([string]::IsNullOrEmpty($line.RackPosition))) {
+        $assetObject.locationData += @{
+            "rackPosition" = $line.RackPosition
+        }
+    }
+
 
     # Add asset tracker id if it is in the upload file
     if (-not ([string]::IsNullOrEmpty($line.AssetTrackerId))) {
@@ -89,3 +107,4 @@ foreach ($line in $CsvData) {
 
     Add-Asset -AssetObject $AssetObject -ApiHost $HostName ;
 }
+
