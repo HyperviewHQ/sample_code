@@ -7,12 +7,6 @@
   Review example file for more information. Note that that import file uses internal IDs
   for model information and asset type.
 
-  .PARAMETER InputPath
-  None. 
-
-  .PARAMETER OutputPath
-  None.
-
   .INPUTS
   Two configuration files. One for hostname and another for client credentials.
   Data file in ./data/in_rack.csv.
