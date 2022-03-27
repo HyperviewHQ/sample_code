@@ -70,12 +70,14 @@ if ($Assets.length -eq 0) {
     Exit 1;
 }
 
+$records = @();
+
 foreach ($asset in $Assets) {
-    $output = @{
+    $mappedAsset = @{
         "u_dns_hostname"              = "";
         "u_hyperview_asset_type"      = $asset.assetType;
         "u_hyperview_id"              = $asset.id;
-        "u_lifecycle_state"           = $assset.assetLifecycleState;
+        "u_lifecycle_state"           = $asset.assetLifecycleState;
         "u_location_path"             = $asset.locationDisplayValue;        
         "u_manufacturer"              = $asset.manufacturerName;
         "u_model"                     = $asset.productName;
@@ -83,14 +85,20 @@ foreach ($asset in $Assets) {
         "u_operating_system"          = "";
         "u_power_providing_asset_ids" = "";
         "u_power_providing_assets"    = "";
-        "u_rack_elevation"            = "";
-        "u_rack_location"             = "";
-        "u_rack_location_id"          = "";
-        "u_rack_side"                 = "";
+        "u_rack_elevation"            = $asset.rackULocation;
+        "u_rack_location"             = $asset.parentDisplayName;
+        "u_rack_location_id"          = $asset.parentId;
+        "u_rack_side"                 = $asset.rackSide;
         "u_room_location"             = "";
         "u_room_location_id"          = "";
         "u_serial_number"             = $asset.serialNumber;
     };
 
-    Write-Host ($output | ConvertTo-Json -Depth 9);   
+    $records += $mappedAsset;
 }
+
+$output = @{
+    "records" = $records;
+};
+
+Write-Host ($output | ConvertTo-Json -Depth 9);   
