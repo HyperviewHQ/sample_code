@@ -82,6 +82,15 @@ foreach ($asset in $Assets) {
         $dnsNameValue = $DiscoveredDnsName.value;
     }
 
+    $OperatingSystem = Get-DiscoveredOs -AccessToken $accessToken -ApiHost $HostName -AssetId $asset.Id;
+
+    $osName = "";
+
+    if ($osName -ne $null) {
+        $osName = $OperatingSystem.name;
+    }
+
+
     $mappedAsset = @{
         "u_dns_hostname"              = $dnsNameValue;
         "u_hyperview_asset_type"      = $asset.assetType;
@@ -91,7 +100,7 @@ foreach ($asset in $Assets) {
         "u_manufacturer"              = $asset.manufacturerName;
         "u_model"                     = $asset.productName;
         "u_name"                      = $asset.displayName; # use the displayNameLowerCase property if you want the output normalized
-        "u_operating_system"          = "";
+        "u_operating_system"          = $osName;
         "u_power_providing_asset_ids" = "";
         "u_power_providing_assets"    = "";
         "u_rack_elevation"            = $asset.rackULocation;
