@@ -73,8 +73,17 @@ if ($Assets.length -eq 0) {
 $records = @();
 
 foreach ($asset in $Assets) {
+
+    $DiscoveredDnsName = Get-DiscoveredDnsName -AccessToken $accessToken -ApiHost $HostName -AssetId $asset.Id;
+
+    $dnsNameValue = "";
+
+    if ($DiscoveredDnsName -ne $null) {
+        $dnsNameValue = $DiscoveredDnsName.value;
+    }
+
     $mappedAsset = @{
-        "u_dns_hostname"              = "";
+        "u_dns_hostname"              = $dnsNameValue;
         "u_hyperview_asset_type"      = $asset.assetType;
         "u_hyperview_id"              = $asset.id;
         "u_lifecycle_state"           = $asset.assetLifecycleState;
