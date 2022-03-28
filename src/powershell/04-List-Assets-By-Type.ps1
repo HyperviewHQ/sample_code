@@ -80,7 +80,7 @@ $CurrentItem = 0;
 
 foreach ($asset in $Assets) {
 
-    Write-Progress -Activity "Progress ..." -Status "$PercentProgress% Complete:" -PercentComplete $PercentProgress;
+    Write-Progress -Activity "Processing API Output: " -Status "$PercentProgress% Complete:" -PercentComplete $PercentProgress;
     Start-Sleep -Milliseconds 250;
 
     $CurrentItem++;
