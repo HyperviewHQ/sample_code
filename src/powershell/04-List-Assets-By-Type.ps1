@@ -21,10 +21,11 @@
 Param(
 
     [Parameter(Mandatory = $true)]
+    [string]$AssetType,
 
-    [string]$AssetType
-
-) #end param
+    [Parameter(Mandatory = $true)]
+    [string]$OutFileName
+)
 
 # Import asset helper functions
 Import-Module ./lib/asset_helpers.psm1
@@ -65,31 +66,47 @@ $Assets = Get-AssetsByType -AccessToken $accessToken -ApiHost $HostName -Type $A
 
 # Receive and map output
 
-if ($Assets.length -eq 0) {
+$AssetsLength = $Assets.length;
+
+if ( $AssetsLength -eq 0 ) {
     Write-Host "Query return zero results";
     Exit 1;
 }
 
 $records = @();
 
+$PercentProgress = 0;
+$CurrentItem = 0;
+
 foreach ($asset in $Assets) {
+
+    Write-Progress -Activity "Progress ..." -Status "$PercentProgress% Complete:" -PercentComplete $PercentProgress;
+    Start-Sleep -Milliseconds 250;
+
+    $CurrentItem++;
+    $PercentProgress = [int](($CurrentItem / $AssetsLength) * 100)
 
     $DiscoveredDnsName = Get-DiscoveredDnsName -AccessToken $accessToken -ApiHost $HostName -AssetId $asset.Id;
 
-    $dnsNameValue = "";
+    $dnsNameValue = [String]"";
 
-    if ($DiscoveredDnsName -ne $null) {
+    if ( -not [string]::IsNullOrEmpty($DiscoveredDnsName) ) {
         $dnsNameValue = $DiscoveredDnsName.value;
     }
 
     $OperatingSystem = Get-DiscoveredOs -AccessToken $accessToken -ApiHost $HostName -AssetId $asset.Id;
 
-    $osName = "";
+    $osName = [String]"";
 
-    if ($osName -ne $null) {
+    if ( -not [string]::IsNullOrEmpty($DiscoveredDnsName) ) {
         $osName = $OperatingSystem.name;
     }
 
+    $powerAssociations = Get-PowerAssociations -AccessToken $accessToken -ApiHost $HostName -AssetId $asset.Id;
+
+    if ($powerAssociations.length -ne 0) {
+        #Write-Host $powerAssociations;
+    }
 
     $mappedAsset = @{
         "u_dns_hostname"              = $dnsNameValue;
@@ -119,4 +136,4 @@ $output = @{
     "records" = $records;
 };
 
-Write-Host ($output | ConvertTo-Json -Depth 9);   
+$output | ConvertTo-Json -Depth 9 | Out-File -FilePath $OutFileName -NoClobber;   
