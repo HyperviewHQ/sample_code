@@ -299,6 +299,18 @@ function Get-PowerAssociations {
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
     ConvertFrom-Json;
 
-    return $Response;
+    $PowerAssociations = @{
+        "by_id"   = @();
+        "by_name" = @();
+    };
+
+    if ( $Response.length -ne 0 ) {
+        foreach ( $powerAssociation in $Response ) {
+            $PowerAssociations.by_id += $powerAssociation.providingSourceDeviceAssetId;
+            $PowerAssociations.by_name += $powerAssociation.providingSourceDeviceAssetDisplayName;
+        }
+    } 
+
+    return $PowerAssociations;
 }
 

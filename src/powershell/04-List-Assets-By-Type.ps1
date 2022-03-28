@@ -6,7 +6,10 @@
   Queries the platform for racks and return the information to stdout. 
 
   .PARAMETER AssetType
-  A string value for asset type. E.g Server, Rack or Location
+  A string value for asset type. E.g Server
+
+  .PARAMETER OutFileName
+  A string value for the file name. E.g. output.json
 
   .INPUTS
   None.
@@ -15,7 +18,7 @@
   List of assets in a flat output format suitable for integration with other systems.
 
   .EXAMPLE
-  > pwsh 04-List-Assets-By-Type.ps1 -AssetType Server
+  > pwsh 04-List-Assets-By-Type.ps1 -AssetType Server -OutFileName output.json
 #>
 
 Param(
@@ -104,10 +107,6 @@ foreach ($asset in $Assets) {
 
     $powerAssociations = Get-PowerAssociations -AccessToken $accessToken -ApiHost $HostName -AssetId $asset.Id;
 
-    if ($powerAssociations.length -ne 0) {
-        #Write-Host $powerAssociations;
-    }
-
     $mappedAsset = @{
         "u_dns_hostname"              = $dnsNameValue;
         "u_hyperview_asset_type"      = $asset.assetType;
@@ -118,8 +117,8 @@ foreach ($asset in $Assets) {
         "u_model"                     = $asset.productName;
         "u_name"                      = $asset.displayName; # use the displayNameLowerCase property if you want the output normalized
         "u_operating_system"          = $osName;
-        "u_power_providing_asset_ids" = "";
-        "u_power_providing_assets"    = "";
+        "u_power_providing_asset_ids" = $powerAssociations.by_id;
+        "u_power_providing_assets"    = $powerAssociations.by_name;
         "u_rack_elevation"            = $asset.rackULocation;
         "u_rack_location"             = $asset.parentDisplayName;
         "u_rack_location_id"          = $asset.parentId;
