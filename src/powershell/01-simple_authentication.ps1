@@ -5,12 +5,6 @@
   .DESCRIPTION
   This is a simple example script.
 
-  .PARAMETER InputPath
-  None. 
-
-  .PARAMETER OutputPath
-  None.
-
   .INPUTS
   Two configuration files. One for hostname and another for client credentials.
 

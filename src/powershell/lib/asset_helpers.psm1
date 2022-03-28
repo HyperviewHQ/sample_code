@@ -125,3 +125,192 @@ function Add-Asset {
         -Body ($AssetObject | ConvertTo-Json) |
     ConvertFrom-Json 
 }
+
+# Get a list of assets by type using advanced search API
+function Get-AssetsByType {
+    param (
+        $AccessToken,
+        $ApiHost,
+        $Type
+    )
+
+    $SearchUri = [string]::Format("https://{0}/api/asset/search", $ApiHost);
+
+    $Headers = @{
+        "method"          = "POST";
+        "Content-Type"    = "application/json";
+        "Authorization"   = "Bearer $AccessToken";
+        "scheme"          = "https";
+        "path"            = "/api/asset/search";
+        "pragma"          = "no-cache";
+        "cache-control"   = "no-cache";
+        "accept"          = "application/json, text/plain, */*";
+        "origin"          = "$ApiHost";
+        "sec-fetch-site"  = "same-origin";
+        "sec-fetch-mode"  = "cors";
+        "sec-fetch-dest"  = "empty";
+        "accept-encoding" = "gzip, deflate, br";
+        "accept-language" = "en-US,en;q=0.9";
+    };
+
+    $SearchPayload = @{
+        "from"                    = "0";
+        "size"                    = "1000";
+        "selectedFields"          = @("DisplayName");
+        "searchComplexDataFields" = @();
+        "query"                   = @{
+            "bool" = @{
+                "filter" = @{
+                    "bool" = @{
+                        "must" = @(
+                            @{
+                                "match" = @{
+                                    "assetType" = "$Type";
+                                };
+                            },
+                            @{
+                                "wildcard" = @{
+                                    "tabDelimitedPath" = "All`t*";
+                                };
+                            }
+                        );
+                    };
+                };
+            };
+        };
+    };
+
+    $Response = Invoke-WebRequest -Uri $SearchUri -Method "POST" `
+        -Headers $Headers `
+        -ContentType "application/json" `
+        -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
+    ConvertFrom-Json |
+    Select-Object -Property data;
+
+    $AssetData = $Response.data
+
+    return $AssetData;
+}
+
+# Get Asset Discovered DNS name
+function Get-DiscoveredDnsName {
+    param (
+        $AccessToken,
+        $ApiHost,
+        $AssetId
+    )
+
+    $SearchUri = [string]::Format("https://{0}/api/asset/assetProperties/{1}", $ApiHost, $AssetId);
+
+    $Headers = @{
+        "method"          = "POST";
+        "Content-Type"    = "application/json";
+        "Authorization"   = "Bearer $AccessToken";
+        "scheme"          = "https";
+        "path"            = "/api/asset/search";
+        "pragma"          = "no-cache";
+        "cache-control"   = "no-cache";
+        "accept"          = "application/json, text/plain, */*";
+        "origin"          = "$ApiHost";
+        "sec-fetch-site"  = "same-origin";
+        "sec-fetch-mode"  = "cors";
+        "sec-fetch-dest"  = "empty";
+        "accept-encoding" = "gzip, deflate, br";
+        "accept-language" = "en-US,en;q=0.9";
+    };
+
+    $Response = Invoke-WebRequest -Uri $SearchUri -Method "GET" `
+        -Headers $Headers `
+        -ContentType "application/json" `
+        -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
+    ConvertFrom-Json |
+    Where-Object -FilterScript { $_.type -eq 'hostName' -and $_.dataSource -eq 'dns' };
+
+    return $Response;
+}
+
+# Get Asset Discovered OS
+function Get-DiscoveredOs {
+    param (
+        $AccessToken,
+        $ApiHost,
+        $AssetId
+    )
+
+    $SearchUri = [string]::Format("https://{0}/api/asset/componentAssets/{1}/virtualComponents?includeAssetTypes=operatingSystem", $ApiHost, $AssetId);
+
+    $Headers = @{
+        "method"          = "POST";
+        "Content-Type"    = "application/json";
+        "Authorization"   = "Bearer $AccessToken";
+        "scheme"          = "https";
+        "path"            = "/api/asset/search";
+        "pragma"          = "no-cache";
+        "cache-control"   = "no-cache";
+        "accept"          = "application/json, text/plain, */*";
+        "origin"          = "$ApiHost";
+        "sec-fetch-site"  = "same-origin";
+        "sec-fetch-mode"  = "cors";
+        "sec-fetch-dest"  = "empty";
+        "accept-encoding" = "gzip, deflate, br";
+        "accept-language" = "en-US,en;q=0.9";
+    };
+
+    $Response = Invoke-WebRequest -Uri $SearchUri -Method "GET" `
+        -Headers $Headers `
+        -ContentType "application/json" `
+        -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
+    ConvertFrom-Json |
+    Where-Object -FilterScript { $_.assetType -eq 'operatingSystem' };
+
+    return $Response;
+}
+
+# Get Power Associations
+function Get-PowerAssociations {
+    param (
+        $AccessToken,
+        $ApiHost,
+        $AssetId
+    )
+
+    $SearchUri = [string]::Format("https://{0}/api/asset/powerSourceAssociations?consumingDestinationAssetId={1}", $ApiHost, $AssetId);
+
+    $Headers = @{
+        "method"          = "POST";
+        "Content-Type"    = "application/json";
+        "Authorization"   = "Bearer $AccessToken";
+        "scheme"          = "https";
+        "path"            = "/api/asset/search";
+        "pragma"          = "no-cache";
+        "cache-control"   = "no-cache";
+        "accept"          = "application/json, text/plain, */*";
+        "origin"          = "$ApiHost";
+        "sec-fetch-site"  = "same-origin";
+        "sec-fetch-mode"  = "cors";
+        "sec-fetch-dest"  = "empty";
+        "accept-encoding" = "gzip, deflate, br";
+        "accept-language" = "en-US,en;q=0.9";
+    };
+
+    $Response = Invoke-WebRequest -Uri $SearchUri -Method "GET" `
+        -Headers $Headers `
+        -ContentType "application/json" `
+        -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
+    ConvertFrom-Json;
+
+    $PowerAssociations = @{
+        "by_id"   = @();
+        "by_name" = @();
+    };
+
+    if ( $Response.length -ne 0 ) {
+        foreach ( $powerAssociation in $Response ) {
+            $PowerAssociations.by_id += $powerAssociation.providingSourceDeviceAssetId;
+            $PowerAssociations.by_name += $powerAssociation.providingSourceDeviceAssetDisplayName;
+        }
+    } 
+
+    return $PowerAssociations;
+}
+
