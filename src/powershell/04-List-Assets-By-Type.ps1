@@ -101,16 +101,19 @@ foreach ($asset in $Assets) {
 
     $osName = [String]"";
 
-    if ( -not [string]::IsNullOrEmpty($DiscoveredDnsName) ) {
+    if ( -not [string]::IsNullOrEmpty($OperatingSystem) ) {
         $osName = $OperatingSystem.name;
     }
 
     $powerAssociations = Get-PowerAssociations -AccessToken $accessToken -ApiHost $HostName -AssetId $asset.Id;
 
+    $rackAndRoomInformation = Get-RackAndRoomInformation -AccessToken $accessToken -ApiHost $HostName -AssetId $asset.parentId;
+
     $mappedAsset = @{
         "u_dns_hostname"              = $dnsNameValue;
         "u_hyperview_asset_type"      = $asset.assetType;
         "u_hyperview_id"              = $asset.id;
+        "u_serial_number"             = $asset.serialNumber;
         "u_lifecycle_state"           = $asset.assetLifecycleState;
         "u_location_path"             = $asset.locationDisplayValue;        
         "u_manufacturer"              = $asset.manufacturerName;
@@ -119,13 +122,18 @@ foreach ($asset in $Assets) {
         "u_operating_system"          = $osName;
         "u_power_providing_asset_ids" = $powerAssociations.by_id;
         "u_power_providing_assets"    = $powerAssociations.by_name;
+        "u_room_location"             = $rackAndRoomInformation.room_name;
+        "u_room_location_id"          = $rackAndRoomInformation.room_id;
+        "u_rack_location"             = $rackAndRoomInformation.rack_name;
+        "u_rack_location_id"          = $rackAndRoomInformation.rack_id;
         "u_rack_elevation"            = $asset.rackULocation;
-        "u_rack_location"             = $asset.parentDisplayName;
-        "u_rack_location_id"          = $asset.parentId;
         "u_rack_side"                 = $asset.rackSide;
-        "u_room_location"             = "";
-        "u_room_location_id"          = "";
-        "u_serial_number"             = $asset.serialNumber;
+        # Sometime asset location does not fit neatly in rack/room system
+        # E.g. Virtual machine in a blade server in a chassis in a rack etc.
+        # These two optional fields will give you direct parent.
+        #        
+        # "u_asset_parent_name"         = $asset.parentDisplayName;
+        # "u_asset_parent_id"           = $asset.parentId;
     };
 
     $records += $mappedAsset;
