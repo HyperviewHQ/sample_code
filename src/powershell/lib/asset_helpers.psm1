@@ -203,20 +203,8 @@ function Get-DiscoveredDnsName {
     $SearchUri = [string]::Format("https://{0}/api/asset/assetProperties/{1}", $ApiHost, $AssetId);
 
     $Headers = @{
-        "method"          = "POST";
-        "Content-Type"    = "application/json";
-        "Authorization"   = "Bearer $AccessToken";
-        "scheme"          = "https";
-        "path"            = "/api/asset/search";
-        "pragma"          = "no-cache";
-        "cache-control"   = "no-cache";
-        "accept"          = "application/json, text/plain, */*";
-        "origin"          = "$ApiHost";
-        "sec-fetch-site"  = "same-origin";
-        "sec-fetch-mode"  = "cors";
-        "sec-fetch-dest"  = "empty";
-        "accept-encoding" = "gzip, deflate, br";
-        "accept-language" = "en-US,en;q=0.9";
+        "Authorization" = "Bearer $AccessToken";
+        "accept"        = "application/json, text/plain, */*";
     };
 
     $Response = Invoke-WebRequest -Uri $SearchUri -Method "GET" `
@@ -240,20 +228,8 @@ function Get-DiscoveredOs {
     $SearchUri = [string]::Format("https://{0}/api/asset/componentAssets/{1}/virtualComponents?includeAssetTypes=operatingSystem", $ApiHost, $AssetId);
 
     $Headers = @{
-        "method"          = "POST";
-        "Content-Type"    = "application/json";
-        "Authorization"   = "Bearer $AccessToken";
-        "scheme"          = "https";
-        "path"            = "/api/asset/search";
-        "pragma"          = "no-cache";
-        "cache-control"   = "no-cache";
-        "accept"          = "application/json, text/plain, */*";
-        "origin"          = "$ApiHost";
-        "sec-fetch-site"  = "same-origin";
-        "sec-fetch-mode"  = "cors";
-        "sec-fetch-dest"  = "empty";
-        "accept-encoding" = "gzip, deflate, br";
-        "accept-language" = "en-US,en;q=0.9";
+        "Authorization" = "Bearer $AccessToken";
+        "accept"        = "application/json, text/plain, */*";
     };
 
     $Response = Invoke-WebRequest -Uri $SearchUri -Method "GET" `
@@ -277,20 +253,8 @@ function Get-PowerAssociations {
     $SearchUri = [string]::Format("https://{0}/api/asset/powerSourceAssociations?consumingDestinationAssetId={1}", $ApiHost, $AssetId);
 
     $Headers = @{
-        "method"          = "POST";
-        "Content-Type"    = "application/json";
-        "Authorization"   = "Bearer $AccessToken";
-        "scheme"          = "https";
-        "path"            = "/api/asset/search";
-        "pragma"          = "no-cache";
-        "cache-control"   = "no-cache";
-        "accept"          = "application/json, text/plain, */*";
-        "origin"          = "$ApiHost";
-        "sec-fetch-site"  = "same-origin";
-        "sec-fetch-mode"  = "cors";
-        "sec-fetch-dest"  = "empty";
-        "accept-encoding" = "gzip, deflate, br";
-        "accept-language" = "en-US,en;q=0.9";
+        "Authorization" = "Bearer $AccessToken";
+        "accept"        = "application/json, text/plain, */*";
     };
 
     $Response = Invoke-WebRequest -Uri $SearchUri -Method "GET" `
@@ -312,5 +276,47 @@ function Get-PowerAssociations {
     } 
 
     return $PowerAssociations;
+}
+
+# Get Rack and Room information for an asset
+function Get-RackAndRoomInformation {
+    param (
+        $AccessToken,
+        $ApiHost,
+        $AssetId
+    )
+
+    $SearchUri = [string]::Format("https://{0}/api/asset/assets/{1}", $ApiHost, $AssetId);
+
+    $Headers = @{
+        "Authorization" = "Bearer $AccessToken";
+        "accept"        = "application/json, text/plain, */*";
+    };
+
+    $Response = Invoke-WebRequest -Uri $SearchUri -Method "GET" `
+        -Headers $Headers `
+        -ContentType "application/json" `
+        -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
+    ConvertFrom-Json;
+
+    $RackAndRoomInfomation = @{
+        "rack_name" = "";
+        "rack_id"   = "";
+        "room_name" = "";
+        "room_id"   = "";
+    };
+
+    if ( $Response.assetTypeId -eq "rack" ) {
+        $RackAndRoomInfomation.rack_name = $Response.name;
+        $RackAndRoomInfomation.rack_id = $Response.id;
+        $RackAndRoomInfomation.room_name = $Response.parentName;
+        $RackAndRoomInfomation.room_id = $Response.parentId;
+    }
+    elseif ( $Response.assetTypeId -eq "location" ) {
+        $RackAndRoomInfomation.room_name = $Response.name;
+        $RackAndRoomInfomation.room_id = $Response.id;
+    }
+
+    return $RackAndRoomInfomation;
 }
 
