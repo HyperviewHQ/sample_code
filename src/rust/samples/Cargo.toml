@@ -1,6 +1,6 @@
 [package]
 edition = "2021"
-name = "simple_authentication"
+name = "hv_api_integration_samples"
 version = "0.1.0"
 [dependencies]
 confy = "*"
