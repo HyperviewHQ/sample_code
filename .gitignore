@@ -54,3 +54,5 @@ Cargo.lock
 # Hyperview Related
 **/client_credential.json
 **/hostname.json
+**/hv_config.toml
+

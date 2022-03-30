@@ -1,0 +1,13 @@
+[package]
+edition = "2021"
+name = "simple_authentication"
+version = "0.1.0"
+[dependencies]
+confy = "*"
+oauth2 = "4.1.0"
+serde = "1.0.136"
+dirs = "4.0.0"
+
+[dependencies.reqwest]
+features = ["blocking", "json"]
+version = "0.11"

@@ -1,0 +1,10 @@
+#
+# Place this file in ~/.hyperview/hv_config.toml
+#
+client_id = "2cb3e5e9-6962-42e8-bbc8-b00d7fa9af3br"
+client_secret = "8a2c0cc3-a5a6-411a-9544-c6c13e6b0264"
+scope = "MyScope"
+auth_url = "https://example.domain.com/connect/authorize"
+token_url = "https://example.domain.com/connect/token"
+instance_url = "https://example.domain.com"
+
