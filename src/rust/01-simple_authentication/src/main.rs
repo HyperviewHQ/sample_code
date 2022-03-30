@@ -9,7 +9,7 @@ use serde_json::Value;
 use std::{path::Path, process};
 
 // Design config struct
-#[derive(Debug, Serialize, Deserialize, Default, Clone)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 struct AppConfig {
     client_id: String,
     client_secret: String,
