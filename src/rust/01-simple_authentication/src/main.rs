@@ -1,5 +1,3 @@
-use std::{path::Path, process};
-
 use confy;
 use oauth2::{
     basic::BasicClient, reqwest::http_client, AuthUrl, ClientId, ClientSecret, Scope,
@@ -7,6 +5,8 @@ use oauth2::{
 };
 use reqwest::header::{ACCEPT, AUTHORIZATION, CONTENT_TYPE};
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
+use std::{path::Path, process};
 
 // Design config struct
 #[derive(Debug, Serialize, Deserialize, Default, Clone)]
@@ -68,9 +68,8 @@ fn main() {
         .header(ACCEPT, "application/json")
         .send()
         .unwrap()
-        .text()
+        .json::<Value>()
         .unwrap();
 
-    // print unformated return data to stdout
-    println!("{:?}", resp);
+    println!("{}", serde_json::to_string_pretty(&resp).unwrap());
 }
