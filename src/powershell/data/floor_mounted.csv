@@ -1,4 +1,4 @@
 Location,Name,LifecycleState,AssetType,ModelId,SerialNumber,AssetTag,RackName,RackUNumber,RackSide,AssetTrackerId
-All/DC1/Room1,Rack-a-1,,3,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,AB10835,,,,,
-All/DC1/Room1,Rack-b-1,,3,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,CD10836,,,,,
-All/DC1/Room2,Rack-a-1,,3,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,EF10833,,,,,
+All/DC1/Room1,Rack-a-1,,rack,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,AB10835,,,,,
+All/DC1/Room1,Rack-b-1,,rack,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,CD10836,,,,,
+All/DC1/Room2,Rack-a-1,,rack,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,EF10833,,,,,
