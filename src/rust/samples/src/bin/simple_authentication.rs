@@ -18,9 +18,6 @@ fn main() {
     }
     let hv_config: AppConfig = confy::load_path(config_path).unwrap();
 
-    // Instantiate a client
-    let req = reqwest::blocking::Client::new();
-
     // Construct target test URL
     let target_url = format!(
         "{}/api/asset/assets?(limit)=25&(sort)=%2BId",
@@ -29,6 +26,9 @@ fn main() {
 
     // Get formatted auth header
     let auth = get_auth_header(hv_config);
+
+    // Instantiate a client
+    let req = reqwest::blocking::Client::new();
 
     // Fetch test data from api
     let resp = req
