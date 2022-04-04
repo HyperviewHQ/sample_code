@@ -63,7 +63,7 @@ foreach ($line in $CsvData) {
         "parentId"                 = $LocationId;
         "creatableAssetProperties" = @(
             @{
-                "type"  = 1;
+                "type"  = "serialNumber";
                 "value" = $line.SerialNumber;
             }
         );
