@@ -93,7 +93,7 @@ fn main() {
             // Instantiate a client
             let req = reqwest::blocking::Client::new();
 
-            // Fetch test data from api
+            // Post asset data to API
             let resp = req
                 .post(&target_url)
                 .header(AUTHORIZATION, &auth_header)
