@@ -96,6 +96,7 @@ function Get-LocationId {
 # Add Asset
 function Add-Asset {
     param (
+        $AccessToken,
         $AssetObject,
         $ApiHost
     )
@@ -119,11 +120,13 @@ function Add-Asset {
         "accept-language" = "en-US,en;q=0.9";
     };
 
-    Invoke-WebRequest -Uri $AddAssetUrl -Method "POST" `
+    $Response = Invoke-WebRequest -Uri $AddAssetUrl -Method "POST" `
         -Headers $Headers `
         -ContentType "application/json" `
         -Body ($AssetObject | ConvertTo-Json) |
     ConvertFrom-Json 
+
+    return $Response;
 }
 
 # Get a list of assets by type using advanced search API
