@@ -79,7 +79,9 @@ foreach ($line in $CsvData) {
         }
     }
 
-    Write-Host "Creating Asset: " $line.Name " Location: " $line.Location;
+    Write-Host "Creating Asset: " $line.Name " Location: " $line.Location ;
 
-    Add-Asset -AssetObject $AssetObject -ApiHost $HostName ;
+    $Response = Add-Asset -AssetObject $AssetObject -ApiHost $HostName -AccessToken $accessToken;
+
+    Write-Host "Server Response: " $Response;
 }

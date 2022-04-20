@@ -1,6 +1,6 @@
 Location,Name,LifecycleState,AssetType,ModelId,SerialNumber,Elevation,RackSide,RackPosition,AssetTrackerId
-All/DC1/Room1/Rack-a-1,rack-a-1-PDU1,,rackPdu,49C8E823-FCA1-4BE4-8BA5-15777351C769,ADDZ0123455,,,,
-All/DC1/Room1/Rack-b-1,rack-b-1-PDU1,,rackPdu,49C8E823-FCA1-4BE4-8BA5-15777351C769,ADDZ0123466,,,,
+All/DC1/Room1/Rack-a-1,rack-a-1-PDU1,,rackPdu,49C8E823-FCA1-4BE4-8BA5-15777351C769,ADDZ0123455,,Rear,Left,
+All/DC1/Room1/Rack-b-1,rack-b-1-PDU1,,rackPdu,49C8E823-FCA1-4BE4-8BA5-15777351C769,ADDZ0123466,,Rear,Right,
 All/DC1/Room2/Rack-a-1,Outlet Dongle (a-1),,otherDevice,A7F8129A-3713-4EBE-9A1F-C3C09F4DC88A,SN123456,,Front,Unknown,
 All/DC1/Room1/Rack-a-1,server1,,server,f4602d32-8334-463b-9669-842317ea2b0d,SN1110,2,Front,,
 All/DC1/Room1/Rack-a-1,server2,,server,f4602d32-8334-463b-9669-842317ea2b0d,SN1111,3,Front,,
