@@ -1,0 +1,8 @@
+Location,Name,LifecycleState,AssetType,ModelId,SerialNumber,BayLocation
+All/AssetImportTest/TestEnclosure,BladeServer1,Active,BladeServer,c3fee0ef-7089-48bc-abd3-0e968c2f256b,SNHV233000A5,1
+All/AssetImportTest/TestEnclosure,BladeServer2,Active,BladeServer,c3fee0ef-7089-48bc-abd3-0e968c2f256b,SNHV241105DN,2
+All/AssetImportTest/TestEnclosure,BladeServer3,Active,BladeServer,c3fee0ef-7089-48bc-abd3-0e968c2f256b,SNHV24170A2D,3
+All/AssetImportTest/TestEnclosure,BladeServer4,Active,BladeServer,c3fee0ef-7089-48bc-abd3-0e968c2f256b,SNHV24170A45,4
+All/AssetImportTest/TestEnclosure,BladeServer5,Active,BladeServer,c3fee0ef-7089-48bc-abd3-0e968c2f256b,SNHV2444063G,5
+All/AssetImportTest/TestEnclosure,BladeServer6,Active,BladeServer,c3fee0ef-7089-48bc-abd3-0e968c2f256b,SNHV2445007N,6
+All/AssetImportTest/TestEnclosure,BladeServer7,Active,BladeServer,c3fee0ef-7089-48bc-abd3-0e968c2f256b,SNHV26020M9Q,7
