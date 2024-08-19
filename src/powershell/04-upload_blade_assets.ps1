@@ -1,15 +1,15 @@
 <#
   .SYNOPSIS
-  Performs a simple upload of in rack assets.
+  Performs a simple upload of blade assets.
 
   .DESCRIPTION
-  Performs a simple upload of in rack assets. Uses a standard CSV import format.
+  Performs a simple upload of blade assets. Uses a standard CSV import format.
   Review example file for more information. Note that that import file uses internal IDs
   for model information and asset type.
 
   .INPUTS
   Two configuration files. One for hostname and another for client credentials.
-  Data file in ./data/in_rack.csv.
+  Data file in ./data/blades.csv.
 
   .OUTPUTS
   Status of uploads and any API error messages, where applicable.
