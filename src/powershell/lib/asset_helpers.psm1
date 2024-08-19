@@ -4,7 +4,8 @@
 #>
 
 # Get Location Id for an asset using advanced search API
-function Get-LocationId {
+function Get-LocationId
+{
     param (
         $AccessToken,
         $Location,
@@ -18,6 +19,8 @@ function Get-LocationId {
     $EndLocation = $LocationData[-1]
     $LocationPath = $LocationData[0..($LocationData.Length - 2)]
     $LocationPathTabbed = $LocationPath -Join "`t"
+
+    # Write-Host "DEBUG:" $EndLocation " - " $LocationPathTabbed
 
     $Headers = @{
         "method"          = "POST";
@@ -48,12 +51,16 @@ function Get-LocationId {
                         "must" = @(
                             @{
                                 "match" = @{
-                                    "assetType" = "$Type";
+                                    "assetType" = @{
+                                        "query" = "$Type"
+                                    };
                                 };
                             },
                             @{
                                 "wildcard" = @{
-                                    "tabDelimitedPath" = "$LocationPathTabbed*";
+                                    "tabDelimitedPath" = @{
+                                        "value" = "$LocationPathTabbed*"
+                                    };
                                 };
                             }
                         );
@@ -79,12 +86,13 @@ function Get-LocationId {
         -Headers $Headers `
         -ContentType "application/json" `
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
-    ConvertFrom-Json |
-    Select-Object -Property data;
+        ConvertFrom-Json |
+        Select-Object -Property data;
 
     $AssetData = $Response.data
 
-    if ($Response.data.length -gt 1) {
+    if ($Response.data.length -gt 1)
+    {
         $AssetData = $Response.data | Where-Object { $_.displayName -eq $RackName }
     }
 
@@ -94,7 +102,8 @@ function Get-LocationId {
 }
 
 # Add Asset
-function Add-Asset {
+function Add-Asset
+{
     param (
         $AccessToken,
         $AssetObject,
@@ -124,13 +133,14 @@ function Add-Asset {
         -Headers $Headers `
         -ContentType "application/json" `
         -Body ($AssetObject | ConvertTo-Json) |
-    ConvertFrom-Json 
+        ConvertFrom-Json 
 
     return $Response;
 }
 
 # Get a list of assets by type using advanced search API
-function Get-AssetsByType {
+function Get-AssetsByType
+{
     param (
         $AccessToken,
         $ApiHost,
@@ -187,8 +197,8 @@ function Get-AssetsByType {
         -Headers $Headers `
         -ContentType "application/json" `
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
-    ConvertFrom-Json |
-    Select-Object -Property data;
+        ConvertFrom-Json |
+        Select-Object -Property data;
 
     $AssetData = $Response.data
 
@@ -196,7 +206,8 @@ function Get-AssetsByType {
 }
 
 # Get Asset Discovered DNS name
-function Get-DiscoveredDnsName {
+function Get-DiscoveredDnsName
+{
     param (
         $AccessToken,
         $ApiHost,
@@ -214,14 +225,15 @@ function Get-DiscoveredDnsName {
         -Headers $Headers `
         -ContentType "application/json" `
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
-    ConvertFrom-Json |
-    Where-Object -FilterScript { $_.type -eq 'hostName' -and $_.dataSource -eq 'dns' };
+        ConvertFrom-Json |
+        Where-Object -FilterScript { $_.type -eq 'hostName' -and $_.dataSource -eq 'dns' };
 
     return $Response;
 }
 
 # Get Asset Discovered OS
-function Get-DiscoveredOs {
+function Get-DiscoveredOs
+{
     param (
         $AccessToken,
         $ApiHost,
@@ -239,14 +251,15 @@ function Get-DiscoveredOs {
         -Headers $Headers `
         -ContentType "application/json" `
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
-    ConvertFrom-Json |
-    Where-Object -FilterScript { $_.assetType -eq 'operatingSystem' };
+        ConvertFrom-Json |
+        Where-Object -FilterScript { $_.assetType -eq 'operatingSystem' };
 
     return $Response;
 }
 
 # Get Power Associations
-function Get-PowerAssociations {
+function Get-PowerAssociations
+{
     param (
         $AccessToken,
         $ApiHost,
@@ -264,15 +277,17 @@ function Get-PowerAssociations {
         -Headers $Headers `
         -ContentType "application/json" `
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
-    ConvertFrom-Json;
+        ConvertFrom-Json;
 
     $PowerAssociations = @{
         "by_id"   = @();
         "by_name" = @();
     };
 
-    if ( $Response.length -ne 0 ) {
-        foreach ( $powerAssociation in $Response ) {
+    if ( $Response.length -ne 0 )
+    {
+        foreach ( $powerAssociation in $Response )
+        {
             $PowerAssociations.by_id += $powerAssociation.providingSourceDeviceAssetId;
             $PowerAssociations.by_name += $powerAssociation.providingSourceDeviceAssetDisplayName;
         }
@@ -282,7 +297,8 @@ function Get-PowerAssociations {
 }
 
 # Get Rack and Room information for an asset
-function Get-RackAndRoomInformation {
+function Get-RackAndRoomInformation
+{
     param (
         $AccessToken,
         $ApiHost,
@@ -300,7 +316,7 @@ function Get-RackAndRoomInformation {
         -Headers $Headers `
         -ContentType "application/json" `
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
-    ConvertFrom-Json;
+        ConvertFrom-Json;
 
     $RackAndRoomInfomation = @{
         "rack_name" = "";
@@ -309,13 +325,14 @@ function Get-RackAndRoomInformation {
         "room_id"   = "";
     };
 
-    if ( $Response.assetTypeId -eq "rack" ) {
+    if ( $Response.assetTypeId -eq "rack" )
+    {
         $RackAndRoomInfomation.rack_name = $Response.name;
         $RackAndRoomInfomation.rack_id = $Response.id;
         $RackAndRoomInfomation.room_name = $Response.parentName;
         $RackAndRoomInfomation.room_id = $Response.parentId;
-    }
-    elseif ( $Response.assetTypeId -eq "location" ) {
+    } elseif ( $Response.assetTypeId -eq "location" )
+    {
         $RackAndRoomInfomation.room_name = $Response.name;
         $RackAndRoomInfomation.room_id = $Response.id;
     }
