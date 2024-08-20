@@ -13,6 +13,13 @@ This is a repository of API integration examples for Hyperview. The hope is that
 
 - Scripts are tested with PowerShell 7.x.
 - Configuration must be kept in a *conf* directory next to the script. Full examples are included with the source.
+- Depending on your machine's OS and security policy you may need to to run:
+
+```
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+```
+
+This sets the execution policy to bypass for the current PowerShell session.
 
 ## Rust
 
