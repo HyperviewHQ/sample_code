@@ -40,12 +40,13 @@ $FetchTokenHeaders = @{
     "Content-Type" = "application/x-www-form-urlencoded"
 }
 
-try {
+try
+{
     $resp = Invoke-RestMethod -Method Post -Headers $FetchTokenHeaders -Body $PayloadBody -Uri $TokenUrl
     Write-Verbose "Successfully authenticated...";
     $accessToken = $resp.access_token;
-}
-catch {
+} catch
+{
     Write-Output "Failed to authenticate. Exiting...";
     Exit $LASTEXITCODE;
 }
@@ -54,8 +55,11 @@ catch {
 $CsvData = Import-Csv -Path ./data/in_rack.csv
 
 # Start Upload Loop
-foreach ($line in $CsvData) {
+foreach ($line in $CsvData)
+{
     $LocationId = Get-LocationId -AccessToken $accessToken -Location $line.Location -ApiHost $HostName -Type "Rack";
+
+    # Write-Host "DEBUG: Location ID = " $LocationId 
 
     $AssetObject = @{
         "name"                     = $line.Name;
@@ -76,13 +80,15 @@ foreach ($line in $CsvData) {
         };
     };
 
-    if (-not ([string]::IsNullOrEmpty($line.Elevation))) {
+    if (-not ([string]::IsNullOrEmpty($line.Elevation)))
+    {
         $assetObject.locationData += @{
             "rackULocation" = $line.Elevation;
         }
     }
 
-    if (-not ([string]::IsNullOrEmpty($line.RackPosition))) {
+    if (-not ([string]::IsNullOrEmpty($line.RackPosition)))
+    {
         $assetObject.locationData += @{
             "rackPosition" = $line.RackPosition
         }
@@ -90,7 +96,8 @@ foreach ($line in $CsvData) {
 
 
     # Add asset tracker id if it is in the upload file
-    if (-not ([string]::IsNullOrEmpty($line.AssetTrackerId))) {
+    if (-not ([string]::IsNullOrEmpty($line.AssetTrackerId)))
+    {
         $AssetObject.creatableAssetProperties += @{
             "type"  = 147;
             "value" = $line.AssetTrackerId;
