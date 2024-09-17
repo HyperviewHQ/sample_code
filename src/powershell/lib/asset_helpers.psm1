@@ -20,8 +20,6 @@ function Get-LocationId
     $LocationPath = $LocationData[0..($LocationData.Length - 2)]
     $LocationPathTabbed = $LocationPath -Join "`t"
 
-    # Write-Host "DEBUG:" $EndLocation " - " $LocationPathTabbed
-
     $Headers = @{
         "method"          = "POST";
         "Content-Type"    = "application/json";
