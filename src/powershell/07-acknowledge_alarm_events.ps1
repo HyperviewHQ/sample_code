@@ -1,18 +1,20 @@
+#!/bin/env pwsh
+
 <#
   .SYNOPSIS
-  List alarm event from the API.
+    List alarm event from the API.
 
   .DESCRIPTION
-  List alarm events from the API.
+    List alarm events from the API.
 
   .INPUTS
-  Two configuration files. One for hostname and another for client credentials.
+    Two configuration files. One for hostname and another for client credentials.
 
   .PARAMETER BatchSize
     Optional parameter to specify size of the batch. Default: 100.
 
   .OUTPUTS
-  API response in CSV to stdout.
+    API response stdout.
 #>
 
 param (
@@ -103,5 +105,3 @@ foreach($WorkBatch in $WorkQueue)
     $Response = Invoke-WebRequest -Uri $Request.Uri -Method Put -Headers $Headers -Body $Body;
     Write-Host ("API Response: ", $Response.StatusCode)
 }
-
-

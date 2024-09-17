@@ -1,18 +1,20 @@
+#!/bin/env pwsh
+
 <#
   .SYNOPSIS
-  Performs a simple upload of floor mounted assets.
+    Performs a simple upload of floor mounted assets.
 
   .DESCRIPTION
-  Performs a simple upload of floor mounted assets. Uses a standard CSV import format.
-  Review example file for more information. Note that that import file uses internal IDs
-  for model information and asset type.
+    Performs a simple upload of floor mounted assets. Uses a standard CSV import format.
+    Review example file for more information. Note that that import file uses internal IDs
+    for model information and asset type.
 
   .INPUTS
-  Two configuration files. One for hostname and another for client credentials.
-  Data file in ./data/floor_mounted.csv.
+    Two configuration files. One for hostname and another for client credentials.
+    Data file in ./data/floor_mounted.csv.
 
   .OUTPUTS
-  Status of uploads and any API error messages, where applicable.
+    Status of uploads and any API error messages, where applicable.
 #>
 
 # Import asset helper functions
@@ -39,12 +41,13 @@ $FetchTokenHeaders = @{
     "Content-Type" = "application/x-www-form-urlencoded"
 }
 
-try {
+try
+{
     $resp = Invoke-RestMethod -Method Post -Headers $FetchTokenHeaders -Body $PayloadBody -Uri $TokenUrl
     Write-Verbose "Successfully authenticated...";
     $accessToken = $resp.access_token;
-}
-catch {
+} catch
+{
     Write-Output "Failed to authenticate. Exiting...";
     Exit $LASTEXITCODE;
 }
@@ -53,7 +56,8 @@ catch {
 $CsvData = Import-Csv -Path ./data/floor_mounted.csv
 
 # Start Upload Loop
-foreach ($line in $CsvData) {
+foreach ($line in $CsvData)
+{
     $LocationId = Get-LocationId -AccessToken $accessToken -Location $line.Location -ApiHost $HostName -Type "Location";
 
     $AssetObject = @{
@@ -72,7 +76,8 @@ foreach ($line in $CsvData) {
     };
 
     # Add asset tracker id if it is in the upload file
-    if (-not ([string]::IsNullOrEmpty($line.AssetTrackerId))) {
+    if (-not ([string]::IsNullOrEmpty($line.AssetTrackerId)))
+    {
         $AssetObject.creatableAssetProperties += @{
             "type"  = 147;
             "value" = $line.AssetTrackerId;

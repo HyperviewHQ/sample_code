@@ -1,20 +1,21 @@
+#!/bin/env pwsh
+
 <#
   .SYNOPSIS
-  Performs a simple upload of in rack assets.
+    Performs a simple upload of in rack assets.
 
   .DESCRIPTION
-  Performs a simple upload of in rack assets. Uses a standard CSV import format.
-  Review example file for more information. Note that that import file uses internal IDs
-  for model information and asset type.
+    Performs a simple upload of in rack assets. Uses a standard CSV import format.
+    Review example file for more information. Note that that import file uses internal IDs
+    for model information and asset type.
 
   .INPUTS
-  Two configuration files. One for hostname and another for client credentials.
-  Data file in ./data/in_rack.csv.
+    Two configuration files. One for hostname and another for client credentials.
+    Data file in ./data/in_rack.csv.
 
   .OUTPUTS
-  Status of uploads and any API error messages, where applicable.
+    Status of uploads and any API error messages, where applicable.
 #>
-
 
 # Import asset helper functions
 Import-Module ./lib/asset_helpers.psm1
@@ -94,7 +95,6 @@ foreach ($line in $CsvData)
         }
     }
 
-
     # Add asset tracker id if it is in the upload file
     if (-not ([string]::IsNullOrEmpty($line.AssetTrackerId)))
     {
@@ -110,4 +110,3 @@ foreach ($line in $CsvData)
 
     Write-Host "Server Response: " $Response;
 }
-

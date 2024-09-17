@@ -1,12 +1,14 @@
+#!/bin/env pwsh
+
 <#
   .SYNOPSIS
-  List alarm event from the API.
+    List alarm event from the API.
 
   .DESCRIPTION
-  List alarm events from the API.
+    List alarm events from the API.
 
   .INPUTS
-  Two configuration files. One for hostname and another for client credentials.
+    Two configuration files. One for hostname and another for client credentials.
 
   .PARAMETER Skip
     Optional parameter to specify the number of records to skip. Default: 0.
@@ -19,7 +21,7 @@
     Not setting this will list only unacknowledged events
 
   .OUTPUTS
-  API response in CSV to stdout.
+    API response in CSV to stdout.
 #>
 
 param (

@@ -1,24 +1,26 @@
+#!/bin/env pwsh
+
 <#
   .SYNOPSIS
-  Download asset information into an array of json objects
+    Download asset information into an array of JSON objects.
 
   .DESCRIPTION
-  Queries the platform for racks and return the information to stdout. 
+    Queries the platform for racks and return the information to stdout.
 
   .PARAMETER AssetType
-  A string value for asset type. E.g Server
+    A string value for asset type. E.g Server.
 
   .PARAMETER OutFileName
-  A string value for the file name. E.g. output.json
+    A string value for the file name. E.g. output.json.
 
   .INPUTS
-  None.
+    None.
 
   .OUTPUTS
-  List of assets in a flat output format suitable for integration with other systems.
+    List of assets in a flat output format suitable for integration with other systems.
 
   .EXAMPLE
-  > pwsh 04-List-Assets-By-Type.ps1 -AssetType Server -OutFileName output.json
+    > pwsh 04-List-Assets-By-Type.ps1 -AssetType Server -OutFileName output.json
 #>
 
 Param(
@@ -54,12 +56,13 @@ $FetchTokenHeaders = @{
     "Content-Type" = "application/x-www-form-urlencoded"
 }
 
-try {
+try
+{
     $resp = Invoke-RestMethod -Method Post -Headers $FetchTokenHeaders -Body $PayloadBody -Uri $TokenUrl
     Write-Verbose "Successfully authenticated...";
     $accessToken = $resp.access_token;
-}
-catch {
+} catch
+{
     Write-Output "Failed to authenticate. Exiting...";
     Exit $LASTEXITCODE;
 }
@@ -71,7 +74,8 @@ $Assets = Get-AssetsByType -AccessToken $accessToken -ApiHost $HostName -Type $A
 
 $AssetsLength = $Assets.length;
 
-if ( $AssetsLength -eq 0 ) {
+if ( $AssetsLength -eq 0 )
+{
     Write-Host "Query return zero results";
     Exit 1;
 }
@@ -81,7 +85,8 @@ $records = @();
 $PercentProgress = 0;
 $CurrentItem = 0;
 
-foreach ($asset in $Assets) {
+foreach ($asset in $Assets)
+{
 
     Write-Progress -Activity "Processing API Output: " -Status "$PercentProgress% Complete:" -PercentComplete $PercentProgress;
     Start-Sleep -Milliseconds 250;
@@ -93,7 +98,8 @@ foreach ($asset in $Assets) {
 
     $dnsNameValue = [String]"";
 
-    if ( -not [string]::IsNullOrEmpty($DiscoveredDnsName) ) {
+    if ( -not [string]::IsNullOrEmpty($DiscoveredDnsName) )
+    {
         $dnsNameValue = $DiscoveredDnsName.value;
     }
 
@@ -101,7 +107,8 @@ foreach ($asset in $Assets) {
 
     $osName = [String]"";
 
-    if ( -not [string]::IsNullOrEmpty($OperatingSystem) ) {
+    if ( -not [string]::IsNullOrEmpty($OperatingSystem) )
+    {
         $osName = $OperatingSystem.name;
     }
 
