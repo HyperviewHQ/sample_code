@@ -21,10 +21,6 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 This sets the execution policy to bypass for the current PowerShell session.
 
-## Rust
-
-- Configuration for Rust programs must be kept in toml config file under $HOME/.hyperview/hv_config.toml. Full example is included with the source.
-
 # Contribution
 
 Contributions are welcome.
