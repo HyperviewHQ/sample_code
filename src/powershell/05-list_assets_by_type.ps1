@@ -24,7 +24,6 @@
 #>
 
 Param(
-
     [Parameter(Mandatory = $true)]
     [string]$AssetType,
 
