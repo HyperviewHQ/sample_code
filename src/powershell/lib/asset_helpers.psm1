@@ -1,6 +1,6 @@
 <#
   .DESCRIPTION
-  A collection of asset API helper functions
+    A collection of asset API helper functions
 #>
 
 # Get Location Id for an asset using advanced search API
