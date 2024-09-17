@@ -1,15 +1,17 @@
+#!/bin/env pwsh
+
 <#
   .SYNOPSIS
-  Performs a simple API query.
+    Performs a simple API query.
 
   .DESCRIPTION
-  This is a simple example script.
+    This is a simple example script.
 
   .INPUTS
-  Two configuration files. One for hostname and another for client credentials.
+    Two configuration files. One for hostname and another for client credentials.
 
   .OUTPUTS
-  API response in JSON to stdout.
+    API response in JSON to stdout.
 #>
 
 # Read Client Configuration
@@ -20,9 +22,9 @@ $HyperviewHost = Get-Content -Raw -Path ./conf/hostname.json | ConvertFrom-Json
 
 #Fetch access token.
 $PayloadBody = @{
-    grant_type    = "client_credentials"
-    client_id     = $ClientConfiguration.ClientId
-    client_secret = $ClientConfiguration.ClientSecret
+  grant_type    = "client_credentials"
+  client_id     = $ClientConfiguration.ClientId
+  client_secret = $ClientConfiguration.ClientSecret
 };
 
 # Put your Hyperview hostname here
@@ -30,22 +32,23 @@ $HostName = [string]::Format("https://{0}", $HyperviewHost.Hostname);
 $TokenUrl = [string]::Format("{0}/connect/token", $HostName);
 
 $FetchTokenHeaders = @{
-    "Content-Type" = "application/x-www-form-urlencoded"
+  "Content-Type" = "application/x-www-form-urlencoded"
 }
 
-try {
-    $resp = Invoke-RestMethod -Method Post -Headers $FetchTokenHeaders -Body $PayloadBody -Uri $TokenUrl
-    Write-Verbose "Successfully authenticated...";
-    $accessToken = $resp.access_token;
-}
-catch {
-    Write-Output "Failed to authenticate. Exiting...";
-    Exit $LASTEXITCODE;
+try
+{
+  $resp = Invoke-RestMethod -Method Post -Headers $FetchTokenHeaders -Body $PayloadBody -Uri $TokenUrl
+  Write-Verbose "Successfully authenticated...";
+  $accessToken = $resp.access_token;
+} catch
+{
+  Write-Output "Failed to authenticate. Exiting...";
+  Exit $LASTEXITCODE;
 }
 
 $Headers = @{
-    "Content-Type"  = "application/json";
-    "Authorization" = "Bearer $accessToken";
+  "Content-Type"  = "application/json";
+  "Authorization" = "Bearer $accessToken";
 };
 
 Write-Host ("`nDebug: Access Token = $accessToken");
@@ -58,5 +61,4 @@ Write-Host("`nCalling Endpoint: $Uri`n");
 $Response = Invoke-RestMethod -Uri "$Uri" -Method Get -Headers $Headers
 
 # Write the data object to a JSON array
-
 $Response.data | ConvertTo-Json

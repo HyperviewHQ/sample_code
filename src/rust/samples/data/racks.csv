@@ -1,4 +1,0 @@
-location,name,lifecycle_state,asset_type,model_id,serial_number,asset_tag
-All/DC1/Room1,Rack-a-1,,rack,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,AB10835,abc
-All/DC1/Room1,Rack-b-1,,rack,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,CD10836,def
-All/DC1/Room2,Rack-a-1,,rack,3afd7bbb-95e8-4bd0-924a-ccee26ac33bc,EF10833,ghi
