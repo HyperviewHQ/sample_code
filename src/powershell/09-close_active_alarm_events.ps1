@@ -85,15 +85,8 @@ for ($i = 0; $i -lt $CsvData.Length; $i++)
 
 foreach($WorkBatch in $WorkQueue)
 {
-    $BulkRequestPayload = @();
-
-    foreach($Id in $WorkBatch)
-    {
-        $BulkRequestPayload += $Id;
-    }
-
     $Request = [System.UriBuilder]$BaseWorkUri;
-    $Body = $BulkRequestPayload | ConvertTo-Json;
+    $Body = $WorkBatch | ConvertTo-Json;
 
     # Invoke a simple API connection to fetch data
     Write-Debug("Calling Endpoint: $Request");
