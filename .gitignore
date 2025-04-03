@@ -51,8 +51,11 @@ Thumbs.db
 # Cargo
 Cargo.lock
 
+# Environment
+.env
+.hv_env
+
 # Hyperview Related
 **/client_credential.json
 **/hostname.json
 **/hv_config.toml
-
