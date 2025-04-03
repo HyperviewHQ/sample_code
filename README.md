@@ -34,7 +34,7 @@ cd python
 2. Initialize and activate virtual environment
 
 ```console
-python -m venv .hv_env
+python3 -m venv .hv_env
 source .hv_env/bin/activate
 ```
 
