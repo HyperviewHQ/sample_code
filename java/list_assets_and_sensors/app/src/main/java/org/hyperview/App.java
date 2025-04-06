@@ -13,11 +13,17 @@ import java.util.StringJoiner;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 
 import io.github.cdimascio.dotenv.Dotenv;
 
 public class App {
     private static final ObjectMapper object_mapper = new ObjectMapper();
+    private static final HttpClient http_client = HttpClient
+                                                    .newBuilder()
+                                                    .connectTimeout(Duration.ofSeconds(30))
+                                                    .build();
+
     public static void main(String[] args) throws Exception {
         // Load .env file
         Dotenv dotenv = Dotenv
@@ -31,12 +37,6 @@ public class App {
         String client_secret = dotenv.get("CLIENT_SECRET");
         String instance_url = dotenv.get("INSTANCE_URL");
 
-        // Build http client
-        HttpClient http_client = HttpClient
-                                    .newBuilder()
-                                    .connectTimeout(Duration.ofSeconds(30))
-                                    .build();
-        
         String access_token = authenticate(instance_url, client_id, client_secret, http_client);
 
         // Fetch asset list
@@ -44,7 +44,10 @@ public class App {
 
         // Get asset metadata
         JsonNode metadata = asset_list.get("_metadata");
-        System.out.println("Asset response metadata: " + metadata.toPrettyString());
+        System.out.println("Asset response metadata: " + metadata.toPrettyString() + "\n");
+
+        ArrayNode asset_array = (ArrayNode) asset_list.get("data"); 
+        printAssetSensors(asset_array);
     }
 
     private static String authenticate(
@@ -117,5 +120,11 @@ public class App {
 
         // return data
         return object_mapper.readTree(resp.body());
+    }
+
+    private static void printAssetSensors(ArrayNode asset_array) {
+        asset_array.forEach(item -> {
+            System.out.println("Id: " + item.get("id").toString() + " | " + "Name: " + item.get("name").toString());
+        });
     }
 }
