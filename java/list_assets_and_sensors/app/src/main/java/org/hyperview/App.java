@@ -47,7 +47,7 @@ public class App {
         System.out.println("Asset response metadata: " + metadata.toPrettyString() + "\n");
 
         ArrayNode asset_array = (ArrayNode) asset_list.get("data"); 
-        printAssetSensors(asset_array);
+        printAssetListSensors(asset_array, instance_url, access_token, http_client);
     }
 
     private static String authenticate(
@@ -94,16 +94,16 @@ public class App {
         params.put("(limit)", "10");
         params.put("(sort)", "+Id");
 
-        StringJoiner paramsString = new StringJoiner("&");
+        StringJoiner params_string = new StringJoiner("&");
 
         for(Map.Entry<String, String> param : params.entrySet()) {
             String key = URLEncoder.encode(param.getKey(), StandardCharsets.UTF_8);
             String value = URLEncoder.encode(param.getValue(), StandardCharsets.UTF_8);
-            paramsString.add(key + "=" + value);
+            params_string.add(key + "=" + value);
         }
 
         // Set asset endpoint
-        String asset_endpoint = instance_url + "/api/asset/assets" + "?" + paramsString.toString();
+        String asset_endpoint = instance_url + "/api/asset/assets" + "?" + params_string.toString();
         System.out.println("Asset endpoint: " + asset_endpoint);
 
         // Set query params
@@ -122,9 +122,58 @@ public class App {
         return object_mapper.readTree(resp.body());
     }
 
-    private static void printAssetSensors(ArrayNode asset_array) {
-        asset_array.forEach(item -> {
-            System.out.println("Id: " + item.get("id").toString() + " | " + "Name: " + item.get("name").toString());
+    private static ArrayNode getAssetSensors(
+        String asset_id,
+        String instance_url,
+        String access_token,
+        HttpClient http_client) throws Exception{
+            // Set sensor endpoint
+            String  sensor_endpoint = instance_url + "/api/asset/sensors/" + asset_id.replace("\"", "");
+            System.out.println("Sensor endpoint: " + sensor_endpoint + "\n");
+
+            HttpRequest req = HttpRequest
+                                .newBuilder()
+                                .GET()
+                                .uri(URI.create(sensor_endpoint))
+                                .header("Content-Type", "application/json")
+                                .header("Authorization", "Bearer " + access_token)
+                                .timeout(Duration.ofSeconds(30))
+                                .build();
+            
+            HttpResponse<String> resp = http_client.send(req, HttpResponse.BodyHandlers.ofString());
+
+            // return data
+            return (ArrayNode) object_mapper.readTree(resp.body());
+    }
+
+    private static void printSensorList(ArrayNode sensor_list) {
+        String row_format = "| %-37s | %-25s | %-35s | %-13s | %-10s |%n";
+        sensor_list.forEach(sensor -> {
+            System.out.printf(
+                row_format,
+                sensor.get("id"),
+                sensor.get("name"),
+                sensor.get("lastValueUpdate"),
+                sensor.get("value"),
+                sensor.get("unitString"));
         });
+    }
+
+    private static void printAssetListSensors(
+        ArrayNode asset_array,
+        String instance_url,
+        String access_token,
+        HttpClient http_client) throws Exception{
+
+        for (int i = 0; i < asset_array.size(); i++) {
+            JsonNode item = asset_array.get(i);
+
+            String asset_id = item.get("id").toString();
+            String asset_name = item.get("name").toString();
+            System.out.println("\nId: " + asset_id + " | " + "Name: " + asset_name + "\n");
+
+            ArrayNode sensor_list = getAssetSensors(asset_id, instance_url, access_token, http_client);
+            printSensorList(sensor_list);
+        }
     }
 }
