@@ -59,3 +59,6 @@ Cargo.lock
 **/client_credential.json
 **/hostname.json
 **/hv_config.toml
+
+# VSCode artifacts
+.vscode
