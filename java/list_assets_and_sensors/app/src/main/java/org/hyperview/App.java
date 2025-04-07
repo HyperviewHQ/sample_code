@@ -71,10 +71,10 @@ public class App {
                             .header("Accept", "application/json")
                             .timeout(Duration.ofSeconds(30))
                             .build();
-        
+
         HttpResponse<String> resp = http_client.send(req, 
                 HttpResponse.BodyHandlers.ofString());
-        
+
         JsonNode json_response = object_mapper.readTree(resp.body());
 
         return json_response.get("access_token").asText();
@@ -83,10 +83,10 @@ public class App {
     private static JsonNode getAssetList(
         String instance_url,
         String access_token,
-        HttpClient http_client) throws Exception{
-        // Build parameter
-        // Fetch the first CRAC units
+        HttpClient http_client) throws Exception {
 
+        // Build uery parameters
+        // Fetch the first i10 CRAC units
         Map<String, String> params = new HashMap<>();
         params.put("assetType", "crac");
         params.put("includeDimensions", "false");
@@ -139,7 +139,7 @@ public class App {
                                 .header("Authorization", "Bearer " + access_token)
                                 .timeout(Duration.ofSeconds(30))
                                 .build();
-            
+
             HttpResponse<String> resp = http_client.send(req, HttpResponse.BodyHandlers.ofString());
 
             // return data
