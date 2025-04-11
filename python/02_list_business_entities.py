@@ -22,18 +22,18 @@ def get_env_value(env_name, default_value=''):
         return default_value
 
 
-def print_be_table(asset_list):
-    table = Table(title="Asset List")
+def print_be_table(business_entities):
+    table = Table(title="Business Entity List")
 
     table.add_column("ID")
-    table.add_column("Asset Name")
-    table.add_column("Parent Name")
+    table.add_column("Name")
+    table.add_column("Type")
 
-    for asset in asset_list:
+    for be in business_entities:
         table.add_row(
-            f"{asset.get('id')}",
-            f"{asset.get('name')}",
-            f"{asset.get('parentName')}"
+            f"{be.get('id')}",
+            f"{be.get('name')}",
+            f"{be.get('businessEntityTypeValue')}"
         )
 
     console = Console()
@@ -109,7 +109,7 @@ except json.JSONDecodeError:
     logger.error("Failed to decode token JSON response.")
     exit(1)
 
-# Fetch asset list
+# Fetch business entity list
 be_endpoint = f"{instance_url}/api/asset/businessEntities/advancedCollection"
 req_headers = {
     "Content-Type": "application/json",
@@ -130,13 +130,13 @@ try:
     resp_json = resp.json()
     logger.debug(f"Response metadata: {resp_json.get('_metadata')}")
 except requests.exceptions.RequestException as e:
-    logger.error(f"Failed to fetch asset data: {e}")
+    logger.error(f"Failed to fetch data: {e}")
     exit(1)
 except json.JSONDecodeError:
-    logger.error("Failed to decode asset JSON response.")
+    logger.error("Failed to decode JSON response.")
     exit(1)
 
-be_data = resp_json.get("data")
-logger.debug("Response data: " + json.dumps(be_data))
+be_list = resp_json.get("data")
+logger.debug("Response data: " + json.dumps(be_list, indent=2))
 
-# print_asset_table(be_list)
+print_be_table(be_list)
