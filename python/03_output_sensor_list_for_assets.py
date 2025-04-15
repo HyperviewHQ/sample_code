@@ -1,16 +1,69 @@
 #!/usr/bin/env python3
 
+from datetime import datetime
 from dotenv import load_dotenv
 from pathlib import Path
 from rich.console import Console
 from rich.table import Table
+import csv
 import json
 import logging
 import requests
+import sys
 
 #
 # Helper functions
 #
+
+
+def write_sensor_table_to_file(sensor_list):
+    # Generate timestamped filename
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    filename = f"output_{timestamp}.csv"
+
+    header = ["assetId", "sensorId", "name", "timestamp", "value", "unit"]
+    sensors = []
+
+    for sensor in sensor_list:
+        sensors.append({
+            "assetId": sensor.get('assetId'),
+            "sensorId": sensor.get('id'),
+            "name": sensor.get('name'),
+            "timestamp": sensor.get('lastValueUpdate'),
+            "value": sensor.get('value'),
+            "unit": sensor.get('unitString')
+        })
+
+    with open(filename, "w", newline="") as csvfile:
+        writer = csv.DictWriter(csvfile, fieldnames=header)
+        writer.writeheader()
+        writer.writerows(sensors)
+
+    print(f"Output file written to: {filename}")
+
+
+def print_sensor_table(sensor_list):
+    table = Table(title="Sensors")
+
+    table.add_column("Asset ID")
+    table.add_column("Sensor ID")
+    table.add_column("Name")
+    table.add_column("Timestamp")
+    table.add_column("Value")
+    table.add_column("Unit")
+
+    for sensor in sensor_list:
+        table.add_row(
+            f"{sensor.get('assetId')}",
+            f"{sensor.get('id')}",
+            f"{sensor.get('name')}",
+            f"{sensor.get('lastValueUpdate')}",
+            f"{sensor.get('value')}",
+            f"{sensor.get('unitString')}"
+        )
+
+    console = Console()
+    console.print(table)
 
 
 def get_env_value(env_name, default_value=''):
@@ -22,44 +75,14 @@ def get_env_value(env_name, default_value=''):
         return default_value
 
 
-def print_asset_table(asset_list):
-    table = Table(title="Asset List")
+def get_sensors(asset_list, access_token, instance_url):
+    sensors = []
 
-    table.add_column("ID")
-    table.add_column("Asset Name")
-    table.add_column("Parent Name")
+    for asset_id in asset_list:
+        asset_sensors = get_asset_sensors(asset_id, access_token, instance_url)
+        sensors.extend(asset_sensors)
 
-    for asset in asset_list:
-        table.add_row(
-            f"{asset.get('id')}",
-            f"{asset.get('name')}",
-            f"{asset.get('parentName')}"
-        )
-
-    console = Console()
-    console.print(table)
-
-
-def print_sensor_table(asset_id, sensor_list):
-    table = Table(title=f"Sensors for asset {asset_id}")
-
-    table.add_column("Sensor ID")
-    table.add_column("Name")
-    table.add_column("Timestamp")
-    table.add_column("Value")
-    table.add_column("Unit")
-
-    for sensor in sensor_list:
-        table.add_row(
-            f"{sensor.get('id')}",
-            f"{sensor.get('name')}",
-            f"{sensor.get('lastValueUpdate')}",
-            f"{sensor.get('value')}",
-            f"{sensor.get('unitString')}"
-        )
-
-    console = Console()
-    console.print(table)
+    return sensors
 
 
 def get_asset_sensors(asset_id, access_token, instance_url):
@@ -73,8 +96,12 @@ def get_asset_sensors(asset_id, access_token, instance_url):
         logger.info("Requesting asset list")
         resp = requests.get(url=sensor_endpoint, headers=req_headers)
         resp.raise_for_status()
-        resp_json = resp.json()
-        print_sensor_table(asset_id, resp_json)
+        sensor_list_json = resp.json()
+
+        for sensor in sensor_list_json:
+            sensor["assetId"] = asset_id
+
+        return sensor_list_json
     except requests.exceptions.RequestException as e:
         logger.error(f"Failed to fetch sensor data: {e}")
         exit(1)
@@ -111,37 +138,12 @@ def authenticate(client_id, client_secret, instance_url):
     return access_token
 
 
-def get_asset_list(instance_url, access_token):
-    asset_endpoint = f"{instance_url}/api/asset/assets"
-    req_headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {access_token}"
-    }
+def get_asset_list(input_file):
+    with open(file=input_file, newline='', encoding='utf-8') as infile:
+        reader = csv.DictReader(infile)
+        rows = list(reader)
 
-    # Fetch the first 10 CRAC units
-    req_params = {
-        "assetType": "crac",
-        "includeDimensions": "false",
-        "(after)": "0",
-        "(limit)": "10",
-        "(sort)": "+Id"
-    }
-
-    try:
-        logger.info("Requesting asset list")
-        resp = requests.get(
-            url=asset_endpoint, params=req_params, headers=req_headers)
-        resp.raise_for_status()
-        resp_json = resp.json()
-        logger.debug(f"Response metadata: {resp_json.get('_metadata')}")
-    except requests.exceptions.RequestException as e:
-        logger.error(f"Failed to fetch asset data: {e}")
-        exit(1)
-    except json.JSONDecodeError:
-        logger.error("Failed to decode asset JSON response.")
-        exit(1)
-
-    asset_list = resp_json.get("data")
+    asset_list = [row["AssetId"] for row in rows]
     return asset_list
 
 
@@ -189,16 +191,24 @@ if __name__ == "__main__":
         logger.error("Instance URL not set.")
         exit(1)
 
+    # Check command arguments
+    if len(sys.argv) != 2:
+        print("Error: you must provide input filename.")
+        print("Example: ./03_output_sensor_list_for_assets.py input_file.csv")
+        print("Exiting.")
+        exit(1)
+
+    # Read input asset list
+    input_file = sys.argv[1]
+    logger.info(f"Input filename: {input_file}")
+
     # Authenticate
     access_token = authenticate(client_id, client_secret, instance_url)
 
-    # Fetch asset list
-    asset_list = get_asset_list(instance_url, access_token)
-    print_asset_table(asset_list)
+    # Get list of asset IDs
+    asset_list = get_asset_list(input_file)
 
-    # Read sensors for assets
-    for asset in asset_list:
-        id = asset.get("id")
-        name = asset.get("name")
-        logger.debug(f"Asset ID: {id}, Name: {name}")
-        get_asset_sensors(id, access_token, instance_url)
+    # Fetch sensor list and print
+    sensor_list = get_sensors(asset_list, access_token, instance_url)
+    print_sensor_table(sensor_list)
+    write_sensor_table_to_file(sensor_list)
