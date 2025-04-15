@@ -1,0 +1,11 @@
+AssetId,Name,AssetLocation,Type
+60671c6f-4f55-4fae-8164-78d08b17916d,10.200.112.75,All / EquipmentCage1,Rack PDU
+be388391-d9c3-49c2-aff4-1782b29231bb,10.38.161.64,All / EquipmentCage1,Network Device
+8172428d-1f24-4119-885a-5fc6e347398d,10.38.161.65,All / EquipmentCage1,Network Device
+9b866224-032e-4d33-9c8a-5f4d58e5ecf3,10.38.184.102,All / EquipmentCage1,Network Device
+e2632cc3-0e19-4baa-b83f-1c3cdfcf7d8b,10.40.43.157,All / EquipmentCage1,Server
+01333f41-0427-44b5-af6a-a7c78090a981,10.40.43.184,All / EquipmentCage1,Environmental
+e4e33a03-87dc-4864-95c2-cfc9069e530c,10.40.43.202,All / EquipmentCage1,Blade Network
+3f8cb98e-a76a-4919-9896-fc773ef648df,10.40.43.28,All / EquipmentCage1,PDU/RPP
+f57ca988-5839-4507-ab6f-1d715e7c98d4,10.40.43.29,All / EquipmentCage1,PDU/RPP
+476b67f7-c569-4443-87bf-54ce7d71892f,10.40.43.30,All / EquipmentCage1,PDU/RPP
