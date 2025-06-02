@@ -32,7 +32,7 @@ Param(
 )
 
 # Import asset helper functions
-Import-Module ./lib/asset_helpers.psm1
+Import-Module ./lib/asset_helpers.psm1 -Force
 
 # Read Client Configuration
 $ClientConfiguration = Get-Content -Raw -Path ./conf/client_credential.json | ConvertFrom-Json
@@ -70,7 +70,6 @@ try
 $Assets = Get-AssetsByType -AccessToken $accessToken -ApiHost $HostName -Type $AssetType;
 
 # Receive and map output
-
 $AssetsLength = $Assets.length;
 
 if ( $AssetsLength -eq 0 )
@@ -119,7 +118,7 @@ foreach ($asset in $Assets)
         "u_dns_hostname"              = $dnsNameValue;
         "u_hyperview_asset_type"      = $asset.assetType;
         "u_hyperview_id"              = $asset.id;
-        "u_serial_number"             = $asset.serialNumber;
+        "u_serial_number"             = $asset.assetProperty_serialNumber;
         "u_lifecycle_state"           = $asset.assetLifecycleState;
         "u_location_path"             = $asset.locationDisplayValue;        
         "u_manufacturer"              = $asset.manufacturerName;

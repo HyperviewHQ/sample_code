@@ -18,7 +18,7 @@ function Get-LocationId
     $LocationData = $Location.Split("/")
     $EndLocation = $LocationData[-1]
     $LocationPath = $LocationData[0..($LocationData.Length - 2)]
-    $LocationPathTabbed = $LocationPath -Join "`t"
+    $LocationPathWithTildeDelimiter = $LocationPath -Join "~"
 
     $Headers = @{
         "method"          = "POST";
@@ -38,46 +38,10 @@ function Get-LocationId
     };
 
     $SearchPayload = @{
-        "from"                    = "0";
-        "size"                    = "10";
-        "selectedFields"          = @("DisplayName");
-        "searchComplexDataFields" = @();
-        "query"                   = @{
-            "bool" = @{
-                "filter"               = @{
-                    "bool" = @{
-                        "must" = @(
-                            @{
-                                "match" = @{
-                                    "assetType" = @{
-                                        "query" = "$Type"
-                                    };
-                                };
-                            },
-                            @{
-                                "wildcard" = @{
-                                    "tabDelimitedPath" = @{
-                                        "value" = "$LocationPathTabbed*"
-                                    };
-                                };
-                            }
-                        );
-                    };
-                };
-                "should"               = @(
-                    @{
-                        "query_string" = @{
-                            "query"  = "`"$EndLocation`"";
-                            "fields" = @(
-                                "displayNameLowerCase^5";
-                                "*";
-                            );
-                        };
-                    }
-                );
-                "minimum_should_match" = 1;
-            };
-        };
+        "offset"               = "0";
+        "limit"                = "10";
+        "attributesToRetrieve" = @("displayName", "id");
+        "filter"               = "displayName = '$EndLocation' AND  assetType = $Type AND delimitedPath STARTS WITH '$LocationPathWithTildeDelimiter~'"
     };
 
     $Response = Invoke-WebRequest -Uri $SearchUri -Method "POST" `
@@ -85,13 +49,13 @@ function Get-LocationId
         -ContentType "application/json" `
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
         ConvertFrom-Json |
-        Select-Object -Property data;
+        Select-Object -Property hits;
 
-    $AssetData = $Response.data
+    $AssetData = $Response.hits
 
-    if ($Response.data.length -gt 1)
+    if ($Response.hits.length -gt 1)
     {
-        $AssetData = $Response.data | Where-Object { $_.displayName -eq $RackName }
+        $AssetData = $Response.hits | Where-Object { $_.displayName -eq $RackName }
     }
 
     $Id = $AssetData.id;
@@ -165,30 +129,21 @@ function Get-AssetsByType
     };
 
     $SearchPayload = @{
-        "from"                    = "0";
-        "size"                    = "1000";
-        "selectedFields"          = @("DisplayName");
-        "searchComplexDataFields" = @();
-        "query"                   = @{
-            "bool" = @{
-                "filter" = @{
-                    "bool" = @{
-                        "must" = @(
-                            @{
-                                "match" = @{
-                                    "assetType" = "$Type";
-                                };
-                            },
-                            @{
-                                "wildcard" = @{
-                                    "tabDelimitedPath" = "All`t*";
-                                };
-                            }
-                        );
-                    };
-                };
-            };
-        };
+        "offset"               = "0";
+        "limit"                = "1000";
+        "attributesToRetrieve" = @(
+            "id",
+            "assetType",
+            "assetProperty_serialNumber",
+            "assetLifecycleState",
+            "locationDisplayValue",
+            "manufacturerName",
+            "productName",
+            "displayName",
+            "rackULocation",
+            "rackSide"
+        );
+        "filter"               = "assetType = '$Type' AND delimitedPath STARTS WITH 'All~'"
     };
 
     $Response = Invoke-WebRequest -Uri $SearchUri -Method "POST" `
@@ -196,9 +151,9 @@ function Get-AssetsByType
         -ContentType "application/json" `
         -Body ($SearchPayload | ConvertTo-Json -Depth 9) |
         ConvertFrom-Json |
-        Select-Object -Property data;
+        Select-Object -Property hits;
 
-    $AssetData = $Response.data
+    $AssetData = $Response.hits
 
     return $AssetData;
 }
