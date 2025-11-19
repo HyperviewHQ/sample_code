@@ -28,7 +28,7 @@ param(
 # Read client configuration
 $ClientConfiguration = Get-Content -Raw -Path ./conf/client_credential.json | ConvertFrom-Json
 
-# Read Hostname
+# Read hostname
 $HyperviewHost = Get-Content -Raw -Path ./conf/hostname.json | ConvertFrom-Json
 
 #Fetch access token.
@@ -36,10 +36,10 @@ $PayloadBody = @{
 	grant_type    = "client_credentials"
 	client_id     = $ClientConfiguration.ClientId
 	client_secret = $ClientConfiguration.ClientSecret
-};
+}
 
-$HostName = [string]::Format("https://{0}", $HyperviewHost.Hostname);
-$TokenUrl = [string]::Format("{0}/connect/token", $HostName);
+$HostName = [string]::Format("https://{0}", $HyperviewHost.Hostname)
+$TokenUrl = [string]::Format("{0}/connect/token", $HostName)
 
 $FetchTokenHeaders = @{
 	"Content-Type" = "application/x-www-form-urlencoded"
@@ -48,50 +48,62 @@ $FetchTokenHeaders = @{
 try
 {
 	$resp = Invoke-RestMethod -Method Post -Headers $FetchTokenHeaders -Body $PayloadBody -Uri $TokenUrl
-	Write-Debug("Successfully authenticated...");
-	$accessToken = $resp.access_token;
+	Write-Debug("Successfully authenticated...")
+	$accessToken = $resp.access_token
 } catch
 {
-	Write-Output "Failed to authenticate. Exiting...";
-	Exit $LASTEXITCODE;
+	Write-Output "Failed to authenticate. Exiting..."
+	Exit $LASTEXITCODE
 }
 
 $Headers = @{
-	"Content-Type"  = "application/json";
-	"Authorization" = "Bearer $accessToken";
-};
+	"Content-Type"  = "application/json"
+	"Authorization" = "Bearer $accessToken"
+}
 
-Write-Debug("`nDebug: Access Token = $accessToken");
+Write-Debug("`nDebug: Access Token = $accessToken")
 
 # Invoke a simple API connection to fetch data
-$Uri = [string]::Format("{0}/api/asset/assets?(limit)=$AssetLimit&(sort)=%2BId", $HostName);
+$Uri = [string]::Format("{0}/api/asset/assets?(limit)=$AssetLimit&(sort)=%2BId", $HostName)
 
-Write-Debug("`nCalling Endpoint: $Uri`n");
+Write-Debug("`nCalling Endpoint: $Uri`n")
 
-$Response = Invoke-RestMethod -Uri $Uri -Method Get -Headers $Headers;
+$Response = Invoke-RestMethod -Uri $Uri -Method Get -Headers $Headers
 
-$AssetDataJson = $Response.data;
+$Assets = $Response.data
+$AllSensors = @()
 
-$AllSensors = @();
+$AssetCount = $($Assets.Count)
+$Counter = 0
 
-foreach ($Asset in $AssetDataJson)
+foreach ($Asset in $Assets)
 {
+	$Counter++
+	$PercentComplete = ($Counter / $AssetCount) * 100
+
+	# Track progress
+	Write-Progress -Activity "Fetching sensors" -Status "Asset $Counter of $AssetCount (ID: $($Asset.id))" -PercentComplete $PercentComplete
+
 	# Set asset id
 	$Id = $($Asset.id)
 	
-	Write-Debug("Fetching Sensors for Asset ID: $($Asset.id)");
+	Write-Debug("Fetching sensors for asset ID: $($Asset.id)")
 
-	$SensorsUri = [string]::Format("{0}/api/asset/sensors/{1}", $HostName, $Id);
-	$Sensors = Invoke-RestMethod -Method Get -Headers $Headers -Uri $SensorsUri;
+	$SensorsUri = [string]::Format("{0}/api/asset/sensors/{1}", $HostName, $Id)
+	$Sensors = Invoke-RestMethod -Method Get -Headers $Headers -Uri $SensorsUri
 	
-	Write-Debug("Read $($Sensors.Count) sensors from asset $Id");
+	Write-Debug("Read $($Sensors.Count) sensors from asset $Id")
 
 	# Add new sensors to list
-	$AllSensors += $Sensors;
+	$AllSensors += $Sensors
 
-	Start-Sleep -Milliseconds 50;
+	Start-Sleep -Milliseconds 50
 }
 
-Write-Output("- Fetched $($AllSensors.Count) Sensors");
-Write-Output("- Writing sensor data to file $OutputFile...");
+# Done
+Write-Progress -Activity "Fetching sensors" -Completed
+
+# Export Data
+Write-Progress -Activity "Exporting data" -Status "Writing to file $OutputFile" -PercentComplete 0
 $AllSensors | ConvertTo-Csv | Out-File -FilePath $OutputFile
+Write-Progress -Activity "Exporting data" -Completed
