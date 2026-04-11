@@ -84,7 +84,7 @@ foreach ($line in $CsvData)
 		}
 	}
 
-	Write-Host "Creating Asset: " $line.Name " Location: " $line.Location;
+	Write-Host "Creating Asset: " $line.Name " Location: " $line.ParentId;
 
 	$object = $AssetObject | ConvertTo-Json;
 
