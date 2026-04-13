@@ -101,5 +101,5 @@ foreach ($line in $CsvData)
 
 	$Response = Add-Asset -AssetObject $AssetObject -ApiHost $HostName -AccessToken $accessToken;
 
-	Write-Host "Server Response: " $Response;
+	Write-Host "Name: " $line.Name " - Server Response: " $Response;
 }
