@@ -1,0 +1,4 @@
+ParentId,Name,AssetType,ModelId,SerialNumber,AssetTag
+0f0659e3-6ce3-43ab-80f2-70b839412f65,Rack-a-1,rack,c97f99ac-d40b-49c9-afc9-12a2e11541ca,AB10835,AT12341
+0f0659e3-6ce3-43ab-80f2-70b839412f65,Rack-b-1,rack,c97f99ac-d40b-49c9-afc9-12a2e11541ca,CD10836,AT56781
+0f0659e3-6ce3-43ab-80f2-70b839412f65,Rack-c-1,rack,c97f99ac-d40b-49c9-afc9-12a2e11541ca,EF10833,AT91011
